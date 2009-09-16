@@ -3,7 +3,7 @@ Hello world! LOLZ XD
 Participants:
 Paul Fertser - general assistance
 Andy McFly - whole bunch of shite
-Rivernight - Goddess of graphics =)))
+Rivernight - Goddess of graphics =))
 
 
 
