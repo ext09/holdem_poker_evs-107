@@ -15,16 +15,81 @@ void deck_array_printf(int deck[DECK_SIZE][2]);
 int main()
 {
     int deck[DECK_SIZE][2];
-    int card;
+
+    int combo[5];
+    /*
+    array combo
+    combo[0]-combination #
+
+    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
+
+    if combo[0]=1 (highest card)
+    combo[1] = suit
+    combo[2] = card # in suit
+
+    if combo[0]=2 (one pair)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for pair)
+
+    if combo[0]=3 (two pairs)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for 1st pair)
+    combo[4] = card # in suit (for 2nd pair)
+
+    if combo[0]=4 (three of a kind)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for triplet)
+
+    if combo[0]=5 (Straight)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[4] = highest card in straight
+
+    if combo[0]=6 (Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = highest card in flush
+
+    if combo[0]=7 (Full House)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for triplet)
+    combo[4] = card # in suit (for pair)
+
+    if combo[0]=8 (Four of a kind)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for cuartet)
+
+    if combo[0]=9 (Straight Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = highest card for straight flush
+
+    if combo[0]=10 (Royal Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for 1st pair)
+    combo[4] = card # in suit (for 2nd pair)
+
+    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
+    */
+
+    int bank[BANK_SIZE];
+    int hand[HAND_SIZE];
+
     srand(time(NULL));
 
     deck_array_generate(deck);
     deck_array_printf(deck);
 
-    /*formula for randomizer*/
+    /*formula for randomizer
     card=rand()%52;
     printf("random card number: %d\n", card);
-
+    */
     return 0;
 }
 
@@ -78,17 +143,36 @@ void deck_array_printf(int deck[DECK_SIZE][2])
 
 
 /*
+    highest_card
+
+    RECEIVES: array HAND[] and array combo[]
+    EFFECT:
+        -writes the highest card info to combo
+*/
+void highest_card(int hand[HAND_SIZE][2], int combo[])
+{
+    int i;
+    if(hand[0][1]>hand[1][1])
+        i=0;
+    else
+        i=1;
+
+    combo[1]=hand[i][0];
+    combo[2]=hand[i][1];
+}
+
+
+/*
     search_combination NOT FINISHED _ NOT TESTED
 
-    RECEIVES: array BANK and array HAND
+    RECEIVES: array BANK[] and array HAND[] and array combo[]
     EFFECT:
         -returns the number of combination (int)
 */
-int search_combination(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2])
+void search_combination(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int combo[])
 {
-    int i, j, m;
+    int i, j;
     int active[ACTIVE][2];
-    int combination=0;
 
 
     /* We copy first BANK and then HAND to ACTIVE just to make things easier here :) */
@@ -108,21 +192,20 @@ int search_combination(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2])
 
 
     /* from here we start searching the combinations*/
+
+    /* PAIR SEARCH */
     for(i=0; i<ACTIVE; i++)
     {
-        for(j=i+1; j<ACTIVE; j++)
+        for(j=1; j<ACTIVE; j++)
         {
-            if(active[i][1]==active[j][1]&&i!=j) /* pair found NOT FINISHED!!!!!*/
-                combination=1;
-            for(m=j+1; m<ACTIVE; m++)
+            if(active[i][1]==active[j][1]&&i!=j)
             {
-                if(active[i][1]==active[j][1]==active[m][1]&&i!=j&&j!=m&&m!=i)
-                    combination=3;          /* 3 found*/
+                combo[0]=2; /* PAIR FOUND*/
+                combo[3]=active[i][1];
             }
-
         }
     }
 
+    /* TWO PAIRS SEARCH */
 
-    return combination;
 }
