@@ -9,7 +9,11 @@
 
 
 void deck_array_generate(int deck[DECK_SIZE][2]);
-void deck_array_printf(int deck[DECK_SIZE][2]);
+void double_array_printf(int array[][2], int ARR_SIZE);
+void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length);
+void highest_card(int hand[HAND_SIZE][2], int combo[]);
+void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACTIVE][2]);
+void search_numbers(int active[ACTIVE][2], int combo[]);
 
 
 int main()
@@ -78,19 +82,52 @@ int main()
     DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
     */
 
-    int bank[BANK_SIZE];
-    int hand[HAND_SIZE];
+    int bank[BANK_SIZE][2];
+    int hand[HAND_SIZE][2];
 
     srand(time(NULL));
 
     deck_array_generate(deck);
-    deck_array_printf(deck);
+
+    printf("\tDeck Array:\n\n");
+    double_array_printf(deck, DECK_SIZE);
+
+    /* FOR TESTING PURPOSES */
+    random_fill_in(deck, bank, BANK_SIZE);
+
+
+
+    printf("\n\nBANK:\n");
+    double_array_printf(bank, BANK_SIZE);
 
     /*formula for randomizer
     card=rand()%52;
     printf("random card number: %d\n", card);
     */
     return 0;
+}
+
+
+
+    /*
+    random_fill_in
+
+    filling in random cards from the DECK to ANY ARRAY (HAND or BANK)
+    */
+void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length)
+{
+    int i,j,random;
+    for(i=0; i<arr_length; i++)
+    {
+        random=rand()%52;
+        array[i][0]=deck[random][0];
+        array[i][1]=deck[random][1];
+        for(j=0; j<i; j++)
+        {
+            if(array[i][0]==array[j][0]&&array[i][1]==array[j][1])
+                i--;
+        }
+    }
 }
 
 
@@ -130,13 +167,87 @@ void deck_array_generate(int deck[DECK_SIZE][2])
     EFFECT:
         -prints out the whole array with lines' numbers
 */
-void deck_array_printf(int deck[DECK_SIZE][2])
+void double_array_printf(int array[][2], int ARR_SIZE)
 {
+    char suit;
     int i;
     printf("\tDeck array:\n\n");
-    for(i=1; i<=DECK_SIZE; i++)
+    for(i=1; i<=ARR_SIZE; i++)
     {
-        printf("\t%d\t%d\t%d\n", i, deck[i-1][0], deck[i-1][1]);
+        printf("\t%d\t", i);
+        switch(array[i-1][0]) {
+            case 1:
+                suit=3;
+                printf("%c ", suit);
+                break;
+            case 2:
+                suit=4;
+                printf("%c ", suit);
+                break;
+            case 3:
+                suit=5;
+                printf("%c ", suit);
+                break;
+            case 4:
+                suit=6;
+                printf("%c ", suit);
+                break;
+        }
+        switch(array[i-1][1]) {
+            case 1:
+                suit=2;
+                printf("%d\n", suit);
+                break;
+            case 2:
+                suit=3;
+                printf("%d\n", suit);
+                break;
+            case 3:
+                suit=4;
+                printf("%d\n", suit);
+                break;
+            case 4:
+                suit=5;
+                printf("%d\n", suit);
+                break;
+            case 5:
+                suit=6;
+                printf("%d\n", suit);
+                break;
+            case 6:
+                suit=7;
+                printf("%d\n", suit);
+                break;
+            case 7:
+                suit=8;
+                printf("%d\n", suit);
+                break;
+            case 8:
+                suit=9;
+                printf("%d\n", suit);
+                break;
+            case 9:
+                suit=10;
+                printf("%d\n", suit);
+                break;
+            case 10:
+                suit='J';
+                printf("%c\n", suit);
+                break;
+            case 11:
+                suit='Q';
+                printf("%c\n", suit);
+                break;
+            case 12:
+                suit='K';
+                printf("%c\n", suit);
+                break;
+            case 13:
+                suit='T';
+                printf("%c\n", suit);
+                break;
+        }
+
     }
 }
 
@@ -161,21 +272,15 @@ void highest_card(int hand[HAND_SIZE][2], int combo[])
     combo[2]=hand[i][1];
 }
 
+    /*
+    build_active
 
-/*
-    search_combination NOT FINISHED _ NOT TESTED
-
-    RECEIVES: array BANK[] and array HAND[] and array combo[]
-    EFFECT:
-        -returns the number of combination (int)
-*/
-void search_combination(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int combo[])
+    simply fill array ACTIVE with the info from BANK and HAND
+    */
+void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACTIVE][2])
 {
-    int i, j;
-    int active[ACTIVE][2];
+    int i;
 
-
-    /* We copy first BANK and then HAND to ACTIVE just to make things easier here :) */
     for(i=0; i<ACTIVE; i++)
     {
         if(i<5)
@@ -189,23 +294,74 @@ void search_combination(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int comb
             active[i][1]=hand[i-BANK_SIZE][1];
         }
     }
+}
 
 
-    /* from here we start searching the combinations*/
+    /*  'PAIR'  ,  'TWO PAIRS'    AND   'THREE OF A KIND'   SEARCH*/
+void search_numbers(int active[ACTIVE][2], int combo[])
+{
+    int array[ACTIVE][2], i, j;
+    int pair=0, triplet=0;
+    /*
+        array[i][0] - card number
+        array[i][1] - number of the same cards
 
-    /* PAIR SEARCH */
+    */
+
+    /* we should turn array[] to NULL just to be sure we won't screw up with this enormous bunch of shite :) */
     for(i=0; i<ACTIVE; i++)
+        array[i][1]=0;
+    i=j=0;
+
+    array[j][0]=active[i][1];
+    array[j][1]++;
+
+    for(i=1; i<ACTIVE; i++)
     {
-        for(j=1; j<ACTIVE; j++)
+        if(array[j][0]!=active[i][1])
         {
-            if(active[i][1]==active[j][1]&&i!=j)
-            {
-                combo[0]=2; /* PAIR FOUND*/
-                combo[3]=active[i][1];
-            }
+            j++;
+            array[j][0]=active[i][1];
+            array[j][1]++;
+        }
+        else if(array[j][0]==active[i][1])
+        {
+            array[j][0]=active[i][1];
+            array[j][1]++;
         }
     }
 
-    /* TWO PAIRS SEARCH */
+    /* Once we've filled up the array we can check*/
+    for(i=0; array[i][1]!=0; i++)
+    {
+        if(array[i][1]==2)
+        {
+            pair++;
+            if(pair<=1)
+            {
+                combo[0]=2;
+                combo[3]=array[i][0];
+            }
+            else
+            {
+                combo[0]=3;
+                combo[4]=array[i][0];
+            }
+        }
+        if(array[i][1]==3)
+        {
+            triplet++;
+            if(triplet<=1)
+            {
+                combo[0]=4;
+                combo[3]=array[i][0];
+            }
+            else
+            {
+                if(array[i][0]>combo[3])
+                    combo[3]=array[i][0];
+            }
+        }
+    }
 
 }
