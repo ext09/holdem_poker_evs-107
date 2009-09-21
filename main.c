@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 #include "menu.h"
+#include "SDL/SDL.h"
+
 
 #define DECK_SIZE 52
 #define BANK_SIZE 5
