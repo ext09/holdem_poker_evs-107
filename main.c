@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "menu.h"
 
 #define DECK_SIZE 52
 #define BANK_SIZE 5
@@ -16,95 +17,36 @@ void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACT
 void search_numbers(int active[ACTIVE][2], int combo[]);
 
 
-int main()
+int main(int argc, char* args[])
 {
     int deck[DECK_SIZE][2];
-
-    int combo[5];
-    /*
-    array combo
-    combo[0]-combination #
-
-    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
-
-    if combo[0]=1 (highest card)
-    combo[1] = suit
-    combo[2] = card # in suit
-
-    if combo[0]=2 (one pair)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for pair)
-
-    if combo[0]=3 (two pairs)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for 1st pair)
-    combo[4] = card # in suit (for 2nd pair)
-
-    if combo[0]=4 (three of a kind)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for triplet)
-
-    if combo[0]=5 (Straight)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[4] = highest card in straight
-
-    if combo[0]=6 (Flush)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = highest card in flush
-
-    if combo[0]=7 (Full House)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for triplet)
-    combo[4] = card # in suit (for pair)
-
-    if combo[0]=8 (Four of a kind)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for cuartet)
-
-    if combo[0]=9 (Straight Flush)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = highest card for straight flush
-
-    if combo[0]=10 (Royal Flush)
-    combo[1] = suit (for highest card)
-    combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for 1st pair)
-    combo[4] = card # in suit (for 2nd pair)
-
-    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
-    */
-
+    int combo[5]; /* documentation for combo is in the end of this file */
     int bank[BANK_SIZE][2];
     int hand[HAND_SIZE][2];
 
     srand(time(NULL));
 
-    deck_array_generate(deck);
+        /* $$$$$$$$$$$$$$$$$ MAIN STRUCTURE' PROTOTYPE $$$$$$$$$$$$$$$$ */
+    while(1)
+    {
+        if(MainMenu()==3)
+        {
+            return 0;
+        }
 
-    printf("\tDeck Array:\n\n");
-    double_array_printf(deck, DECK_SIZE);
+        deck_array_generate(deck);
+
+        printf("\tDeck Array:\n\n");
+        double_array_printf(deck, DECK_SIZE);
+
 
     /* FOR TESTING PURPOSES */
-    random_fill_in(deck, bank, BANK_SIZE);
+        random_fill_in(deck, bank, BANK_SIZE);
 
-
-
-    printf("\n\nBANK:\n");
-    double_array_printf(bank, BANK_SIZE);
-
-    /*formula for randomizer
-    card=rand()%52;
-    printf("random card number: %d\n", card);
-    */
-    return 0;
+        printf("\n\nBANK:\n");
+        double_array_printf(bank, BANK_SIZE);
+        return 0;
+    }
 }
 
 
@@ -119,7 +61,7 @@ void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length)
     int i,j,random;
     for(i=0; i<arr_length; i++)
     {
-        random=rand()%52;
+        random=rand()%52; /* main formula generating random card number */
         array[i][0]=deck[random][0];
         array[i][1]=deck[random][1];
         for(j=0; j<i; j++)
@@ -171,7 +113,6 @@ void double_array_printf(int array[][2], int ARR_SIZE)
 {
     char suit;
     int i;
-    printf("\tDeck array:\n\n");
     for(i=1; i<=ARR_SIZE; i++)
     {
         printf("\t%d\t", i);
@@ -365,3 +306,67 @@ void search_numbers(int active[ACTIVE][2], int combo[])
     }
 
 }
+
+
+
+
+/*
+    array combo
+    combo[0]-combination #
+
+    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
+
+    if combo[0]=1 (highest card)
+    combo[1] = suit
+    combo[2] = card # in suit
+
+    if combo[0]=2 (one pair)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for pair)
+
+    if combo[0]=3 (two pairs)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for 1st pair)
+    combo[4] = card # in suit (for 2nd pair)
+
+    if combo[0]=4 (three of a kind)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for triplet)
+
+    if combo[0]=5 (Straight)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[4] = highest card in straight
+
+    if combo[0]=6 (Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = highest card in flush
+
+    if combo[0]=7 (Full House)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for triplet)
+    combo[4] = card # in suit (for pair)
+
+    if combo[0]=8 (Four of a kind)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for cuartet)
+
+    if combo[0]=9 (Straight Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = highest card for straight flush
+
+    if combo[0]=10 (Royal Flush)
+    combo[1] = suit (for highest card)
+    combo[2] = card # in suit (for highest card)
+    combo[3] = card # in suit (for 1st pair)
+    combo[4] = card # in suit (for 2nd pair)
+
+    DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
+    */
