@@ -33,12 +33,17 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
+			<Add option="-lmingw32 -lSDLmain -lSDL" />
 			<Add library="libSDL.dll.a" />
 			<Add library="libSDLmain.a" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="menu.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
