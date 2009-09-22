@@ -12,6 +12,7 @@ int MainMenu()
         {
             case 1:
                 StartMenu();
+                return choice;
                 break;
             case 2:
                 SettingsMenu();
@@ -21,10 +22,9 @@ int MainMenu()
         }
     }
 }
-int StartMenu()
+void StartMenu()
 {
     printf("smth1\n");
-    return 0;
 }
 int SettingsMenu()
 {

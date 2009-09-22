@@ -2,14 +2,12 @@
 #include <stdio.h>
 #include <time.h>
 #include "menu.h"
-#include "SDL/SDL.h"
-
 
 #define DECK_SIZE 52
+#define SUIT_SIZE 13
 #define BANK_SIZE 5
 #define HAND_SIZE 2
 #define ACTIVE BANK_SIZE+HAND_SIZE
-
 
 void deck_array_generate(int deck[DECK_SIZE][2]);
 void double_array_printf(int array[][2], int ARR_SIZE);
@@ -17,7 +15,8 @@ void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length);
 void highest_card(int hand[HAND_SIZE][2], int combo[]);
 void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACTIVE][2]);
 void search_numbers(int active[ACTIVE][2], int combo[]);
-
+void print_combo(int combo[]);
+void printf_card(int card, short int type);
 
 int main(int argc, char* args[])
 {
@@ -25,8 +24,16 @@ int main(int argc, char* args[])
     int combo[5]; /* documentation for combo is in the end of this file */
     int bank[BANK_SIZE][2];
     int hand[HAND_SIZE][2];
+    int active[ACTIVE][2];
+
+    int i;
 
     srand(time(NULL));
+
+    for(i=0; i<5; i++)
+    {
+        combo[i]=0;
+    }
 
         /* $$$$$$$$$$$$$$$$$ MAIN STRUCTURE' PROTOTYPE $$$$$$$$$$$$$$$$ */
     while(1)
@@ -44,13 +51,184 @@ int main(int argc, char* args[])
 
     /* FOR TESTING PURPOSES */
         random_fill_in(deck, bank, BANK_SIZE);
+        random_fill_in(deck, hand, HAND_SIZE);
+
+    /* UNDER COMMENT SIGNS - JUST TO CLEAN UP THE OUTPUT
 
         printf("\n\nBANK:\n");
         double_array_printf(bank, BANK_SIZE);
+
+        printf("\n\nHAND:\n");
+        double_array_printf(hand, HAND_SIZE);
+
+        highest_card(hand, combo);
+
+        printf("highest card is %d %d", combo[1], combo[2]);
+
+        build_active(bank, hand, active);
+
+        printf("\n\nACTIVE:\n");
+        double_array_printf(active, ACTIVE);
+
+        search_numbers(active, combo);
+
+        print_combo(combo);
+
+    */
         return 0;
     }
 }
 
+
+
+void print_combo(int combo[])
+{
+    int card;
+    int choice=combo[0];
+    switch(choice)
+    {
+        case 1:
+            card=combo[1];
+            printf("Kicker: ");
+            printf_card(card, 0);
+            card=combo[2];
+            printf_card(card, 1);
+            break;
+        case 2:
+            printf("Pair of ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 3:
+            printf("Two pairs of");
+            card=combo[3];
+            printf_card(card, 1);
+            card=combo[4];
+            printf_card(card, 1);
+            break;
+        case 4:
+            printf("Three ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 5:
+            printf("Straight with highest card ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 6:
+            printf("FLush with highest card ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 7:
+            printf("Full house with ");
+            card=combo[3];
+            printf_card(card, 1);
+            printf("and ");
+            card=combo[4];
+            printf_card(card, 1);
+            break;
+        case 8:
+            printf("Four ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 9:
+            printf("Straight FLush with highest ");
+            card=combo[3];
+            printf_card(card, 1);
+            break;
+        case 10:
+            printf("Royal FLush with suit ");
+            card=combo[3];
+            printf_card(card, 0);
+            break;
+    }
+}
+void printf_card(int card, short int type)
+{
+    int suit;
+    if(type==0)
+    {
+        switch(card) {
+            case 1:
+                suit=3;
+                printf("%c ", suit);
+                break;
+            case 2:
+                suit=4;
+                printf("%c ", suit);
+                break;
+            case 3:
+                suit=5;
+                printf("%c ", suit);
+                break;
+            case 4:
+                suit=6;
+                printf("%c ", suit);
+                break;
+        }
+    }
+    else if(type==1)
+    {
+        switch(card)
+        {
+            case 1:
+                suit=2;
+                printf("%d ", suit);
+                break;
+            case 2:
+                suit=3;
+                printf("%d ", suit);
+                break;
+            case 3:
+                suit=4;
+                printf("%d ", suit);
+                break;
+            case 4:
+                suit=5;
+                printf("%d ", suit);
+                break;
+            case 5:
+                suit=6;
+                printf("%d ", suit);
+                break;
+            case 6:
+                suit=7;
+                printf("%d ", suit);
+                break;
+            case 7:
+                suit=8;
+                printf("%d ", suit);
+                break;
+            case 8:
+                suit=9;
+                printf("%d ", suit);
+                break;
+            case 9:
+                suit=10;
+                printf("%d ", suit);
+                break;
+            case 10:
+                suit='J';
+                printf("%c ", suit);
+                break;
+            case 11:
+                suit='Q';
+                printf("%c ", suit);
+                break;
+            case 12:
+                suit='K';
+                printf("%c ", suit);
+                break;
+            case 13:
+                suit='T';
+                printf("%c ", suit);
+                break;
+        }
+    }
+}
 
 
     /*
@@ -243,68 +421,68 @@ void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACT
     /*  'PAIR'  ,  'TWO PAIRS'    AND   'THREE OF A KIND'   SEARCH*/
 void search_numbers(int active[ACTIVE][2], int combo[])
 {
-    int array[ACTIVE][2], i, j;
+    int array[SUIT_SIZE], i;
     int pair=0, triplet=0;
     /*
-        array[i][0] - card number
-        array[i][1] - number of the same cards
-
+        i+1 - card number
+        array[i] - number of the same cards
     */
 
     /* we should turn array[] to NULL just to be sure we won't screw up with this enormous bunch of shite :) */
+    for(i=0; i<SUIT_SIZE; i++)
+        array[i]=0;
+
+    /*for i cycles active[]. in there we should decide weither to put card on some previous place or on the new one. */
     for(i=0; i<ACTIVE; i++)
-        array[i][1]=0;
-    i=j=0;
-
-    array[j][0]=active[i][1];
-    array[j][1]++;
-
-    for(i=1; i<ACTIVE; i++)
     {
-        if(array[j][0]!=active[i][1])
+        array[active[i][1]-1]++;
+    }
+
+    printf("array:\n");
+    for(i=0; i<SUIT_SIZE; i++)
+    {
+        printf("\t%d\t%d\n", i, array[i]);
+    }
+    /* Once we've filled up the array we can check*/
+    for(i=0; i<SUIT_SIZE; i++)
+    {
+        switch(array[i])
         {
-            j++;
-            array[j][0]=active[i][1];
-            array[j][1]++;
-        }
-        else if(array[j][0]==active[i][1])
-        {
-            array[j][0]=active[i][1];
-            array[j][1]++;
+            case 2:
+                pair++;
+                if(pair<=1)
+                {
+                    combo[0]=2;
+                    combo[3]=i+1;
+                }
+                else
+                {
+                    combo[0]=3;
+                    combo[4]=i+1;
+                }
+                break;
+            case 3:
+                triplet++;
+                if(triplet<=1)
+                {
+                    combo[0]=4;
+                    combo[3]=i+1;
+                }
+                else
+                {
+                    if(i+1>combo[3])
+                        combo[3]=i+1;
+                }
+                break;
         }
     }
 
-    /* Once we've filled up the array we can check*/
-    for(i=0; array[i][1]!=0; i++)
+
+    /*combo[] check for consistency*/
+    printf("\n\ncombo\n");
+    for(i=0; i<5; i++)
     {
-        if(array[i][1]==2)
-        {
-            pair++;
-            if(pair<=1)
-            {
-                combo[0]=2;
-                combo[3]=array[i][0];
-            }
-            else
-            {
-                combo[0]=3;
-                combo[4]=array[i][0];
-            }
-        }
-        if(array[i][1]==3)
-        {
-            triplet++;
-            if(triplet<=1)
-            {
-                combo[0]=4;
-                combo[3]=array[i][0];
-            }
-            else
-            {
-                if(array[i][0]>combo[3])
-                    combo[3]=array[i][0];
-            }
-        }
+        printf("\t%d\n", combo[i]);
     }
 
 }
@@ -341,7 +519,7 @@ void search_numbers(int active[ACTIVE][2], int combo[])
     if combo[0]=5 (Straight)
     combo[1] = suit (for highest card)
     combo[2] = card # in suit (for highest card)
-    combo[4] = highest card in straight
+    combo[3] = highest card in straight
 
     if combo[0]=6 (Flush)
     combo[1] = suit (for highest card)
@@ -367,8 +545,7 @@ void search_numbers(int active[ACTIVE][2], int combo[])
     if combo[0]=10 (Royal Flush)
     combo[1] = suit (for highest card)
     combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for 1st pair)
-    combo[4] = card # in suit (for 2nd pair)
+    combo[3] = suit (for royal flush)
 
     DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
     */
