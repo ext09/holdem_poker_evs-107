@@ -4,7 +4,7 @@ Participants:
 Paul Fertser - general assistance
 Andy McFly - whole bunch of shite
 Rivernight - Goddess of graphics =))
-
+Irresistible- I'll provide you with the unforgettable wandering in LAN
 
 
 	Essential Git! :)
