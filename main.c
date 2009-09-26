@@ -7,10 +7,10 @@
 
 int main(int argc, char* args[])
 {
-    struct c combo;
     struct player players[SEATS];
     struct card deck[DECK_SIZE], bank[BANK_SIZE];
 
+    short int i;
     srand(time(NULL));
 
         /* $$$$$$$$$$$$$$$$$ MAIN STRUCTURE' PROTOTYPE $$$$$$$$$$$$$$$$ */
@@ -30,14 +30,19 @@ int main(int argc, char* args[])
 
         printf("\tDeck Array:\n\n");
         cards_printf(deck, DECK_SIZE);
-
         random_fill_in(deck, bank, BANK_SIZE);
-
         printf("\n\nBANK:\n");
         cards_printf(bank, BANK_SIZE);
-/*      highest_card(hand, combo);
-        printf("highest card is %d %d", combo[1], combo[2]);
-        build_active(bank, hand, active);
+        printf("\n\nPlayers' Personal Info\n\n");
+        for (i=0; i<SEATS; i++)
+        {
+            printf("\n\nPlayer %d\n", i+1);
+            random_fill_in(deck, players[i].hand, HAND_SIZE);
+            find_kicker(players[i].hand, players[i].c);
+            printf("\nHAND:\n");
+            cards_printf(players[i].hand, HAND_SIZE);
+        }
+/*      build_active(bank, hand, active);
         printf("\n\nACTIVE:\n");
         cards_printf(active, ACTIVE);
         search_combination(active, combo);
@@ -50,58 +55,7 @@ int main(int argc, char* args[])
     }
 }
 
-/*
-void print_combo(int combo[])
-{
-    switch(combo[0])
-    {
-        case 1:
-            printf("Kicker: ");
-            printf_card(combo[1], 0);
-            printf_card(combo[2], 1);
-            break;
-        case 2:
-            printf("Pair of ");
-            printf_card(combo[3], 1);
-            break;
-        case 3:
-            printf("Two pairs of");
-            printf_card(combo[3], 1);
-            printf_card(combo[4], 1);
-            break;
-        case 4:
-            printf("Three ");
-            printf_card(combo[4], 1);
-            break;
-        case 5:
-            printf("Straight with highest card ");
-            printf_card(combo[3], 1);
-            break;
-        case 6:
-            printf("FLush with highest card ");
-            printf_card(combo[3], 1);
-            break;
-        case 7:
-            printf("Full house with ");
-            printf_card(combo[3], 1);
-            printf("and ");
-            printf_card(combo[4], 1);
-            break;
-        case 8:
-            printf("Four ");
-            printf_card(combo[3], 1);
-            break;
-        case 9:
-            printf("Straight Flush with highest ");
-            printf_card(combo[3], 1);
-            break;
-        case 10:
-            printf("Royal Flush with suit ");
-            printf_card(combo[3], 0);
-            break;
-    }
-}
-*/
+
 
 void random_fill_in(struct card *deck, struct card *array, int arr_length)
 {
@@ -172,24 +126,17 @@ void cards_printf(struct card *cards, int ARR_SIZE)
 }
 
 
-
-/*
-    highest_card
-
-    RECEIVES: array HAND[] and array combo[]
-    EFFECT:
-        -writes the highest card info to combo
-*/
-void highest_card(int hand[HAND_SIZE][2], int combo[])
+void find_kicker(struct card hand[HAND_SIZE], struct combo c)
 {
     int i;
-    if(hand[0][1]>hand[1][1])
+    if(hand[0].rank>hand[1].rank)
         i=0;
     else
         i=1;
 
-    combo[1]=hand[i][0];
-    combo[2]=hand[i][1];
+        c.kicker.suit=hand[i].suit;
+        c.kicker.rank=hand[i].rank;
+
 }
 
     /*
@@ -306,7 +253,6 @@ void search_combination(int active[ACTIVE][2], int combo[])
     }
 
     /* searching all other combinations here*/
-
 }
 
 
