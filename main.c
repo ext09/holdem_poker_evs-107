@@ -1,85 +1,56 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+#include "main.h"
 #include "menu.h"
-
-#define DECK_SIZE 52
-#define SUIT_SIZE 13
-#define BANK_SIZE 5
-#define HAND_SIZE 2
-#define ACTIVE BANK_SIZE+HAND_SIZE
-
-void deck_array_generate(int deck[DECK_SIZE][2]);
-void double_array_printf(int array[][2], int ARR_SIZE);
-void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length);
-void highest_card(int hand[HAND_SIZE][2], int combo[]);
-void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACTIVE][2]);
-void search_combination(int active[ACTIVE][2], int combo[]);
-void print_combo(int combo[]);
-void printf_card(int card, short int type);
-
-enum suits {SUIT1=3, SUIT2, SUIT3, SUIT4};
-enum cards {CARD2=2, CARD3, CARD4, CARD5, CARD6, CARD7, CARD8, CARD9, CARD10, CARD_J='J', CARD_Q='Q', CARD_K='K', CARD_T='T'};
 
 int main(int argc, char* args[])
 {
-    int deck[DECK_SIZE][2];
-    int combo[5]; /* documentation for combo is in the end of this file */
-    int bank[BANK_SIZE][2];
-    int hand[HAND_SIZE][2];
-    int active[ACTIVE][2];
-
-    int i;
+    struct c combo;
+    struct player players[SEATS];
+    struct card deck[DECK_SIZE], bank[BANK_SIZE];
 
     srand(time(NULL));
-
-
-
-    for(i=0; i<5; i++)
-    {
-        combo[i]=0;
-    }
 
         /* $$$$$$$$$$$$$$$$$ MAIN STRUCTURE' PROTOTYPE $$$$$$$$$$$$$$$$ */
     while(1)
     {
-        if(MainMenu()==3)
+        switch(MainMenu())
         {
-            return 0;
+            case -1:
+                return 0;
+            case 1:
+                puts("the game begins\n");
+                break;
         }
 
         deck_array_generate(deck);
                         /* UNDER COMMENT SIGNS - JUST TO CLEAN UP THE OUTPUT */
 
         printf("\tDeck Array:\n\n");
-        double_array_printf(deck, DECK_SIZE);
+        cards_printf(deck, DECK_SIZE);
 
-
-    /* FOR TESTING PURPOSES */
         random_fill_in(deck, bank, BANK_SIZE);
-        random_fill_in(deck, hand, HAND_SIZE);
 
         printf("\n\nBANK:\n");
-        double_array_printf(bank, BANK_SIZE);
-        printf("\n\nHAND:\n");
-        double_array_printf(hand, HAND_SIZE);
-        highest_card(hand, combo);
+        cards_printf(bank, BANK_SIZE);
+/*      highest_card(hand, combo);
         printf("highest card is %d %d", combo[1], combo[2]);
         build_active(bank, hand, active);
         printf("\n\nACTIVE:\n");
-        double_array_printf(active, ACTIVE);
+        cards_printf(active, ACTIVE);
         search_combination(active, combo);
         print_combo(combo);
+    */
 
 
-
-    printf("\nYou may test you code here.\n");
+        printf("\nYou may test you code here.\n");
         return 0;
     }
 }
 
-
-
+/*
 void print_combo(int combo[])
 {
     switch(combo[0])
@@ -100,7 +71,7 @@ void print_combo(int combo[])
             break;
         case 4:
             printf("Three ");
-            printf_card(combo[3], 1);
+            printf_card(combo[4], 1);
             break;
         case 5:
             printf("Straight with highest card ");
@@ -121,126 +92,64 @@ void print_combo(int combo[])
             printf_card(combo[3], 1);
             break;
         case 9:
-            printf("Straight FLush with highest ");
+            printf("Straight Flush with highest ");
             printf_card(combo[3], 1);
             break;
         case 10:
-            printf("Royal FLush with suit ");
+            printf("Royal Flush with suit ");
             printf_card(combo[3], 0);
             break;
     }
 }
-void printf_card(int card, short int type)
+*/
+
+void random_fill_in(struct card *deck, struct card *array, int arr_length)
 {
-    if(type==0)
-    {
-        switch(card) {
-            case 1:
-                printf("%c ", SUIT1);
-                break;
-            case 2:
-                printf("%c ", SUIT2);
-                break;
-            case 3:
-                printf("%c ", SUIT3);
-                break;
-            case 4:
-                printf("%c ", SUIT4);
-                break;
-        }
-    }
-    else if(type==1)
-    {
-        switch(card)
-        {
-            case 1:
-                printf("%d ", CARD2);
-                break;
-            case 2:
-                printf("%d ", CARD3);
-                break;
-            case 3:
-                printf("%d ", CARD4);
-                break;
-            case 4:
-                printf("%d ", CARD5);
-                break;
-            case 5:
-                printf("%d ", CARD6);
-                break;
-            case 6:
-                printf("%d ", CARD7);
-                break;
-            case 7:
-                printf("%d ", CARD8);
-                break;
-            case 8:
-                printf("%d ", CARD9);
-                break;
-            case 9:
-                printf("%d ", CARD10);
-                break;
-            case 10:
-                printf("%c ", CARD_J);
-                break;
-            case 11:
-                printf("%c ", CARD_Q);
-                break;
-            case 12:
-                printf("%c ", CARD_K);
-                break;
-            case 13:
-                printf("%c ", CARD_T);
-                break;
-        }
-    }
-}
+    int i=0, random;
 
-
-    /*
-    random_fill_in
-
-    filling in random cards from the DECK to ANY ARRAY (HAND or BANK)
-    */
-void random_fill_in(int deck[DECK_SIZE][2], int array[][2], int arr_length)
-{
-    int i,j,random;
     for(i=0; i<arr_length; i++)
     {
-        random=rand()%52; /* main formula generating random card number */
-        array[i][0]=deck[random][0];
-        array[i][1]=deck[random][1];
-        for(j=0; j<i; j++)
+        random=rand()%DECK_SIZE;
+        if(deck[random].used!=YES)
         {
-            if(array[i][0]==array[j][0]&&array[i][1]==array[j][1])
-            {
-                random=rand()%52;
-                array[i][0]=deck[random][0];
-                array[i][1]=deck[random][1];
-                j=0;
-            }
+            array[i].suit=deck[random].suit;
+            array[i].rank=deck[random].rank;
+            deck[i].used=YES;
         }
+        else
+            i--;
     }
 }
 
-/*
-    deck_array_generate
 
-    RECEIVES: integer array with # of cols - DECK_SIZE, and # of rows - 2
-    EFFECT:
-        -fills 1st col with suit number (from 1 to 4)
-        -fills 2nd col with card number in each suit (from 1 to 13)
-*/
-void deck_array_generate(int deck[DECK_SIZE][2])
+void deck_array_generate(struct card *deck)
 {
     int i, m=1, n=1;
 
-
-
     for(i=0; i<DECK_SIZE; i++)
     {
-        deck[i][0]=m;
-        deck[i][1]=n;
+        switch(m) {
+            case 1:  deck[i].suit=HEARTS; break;
+            case 2:  deck[i].suit=DIAMONDS; break;
+            case 3:  deck[i].suit=CLUBS; break;
+            case 4:  deck[i].suit=SPADES; break;
+        }
+        switch(n) {
+            case 1:  deck[i].rank=TWO; break;
+            case 2:  deck[i].rank=THREE; break;
+            case 3:  deck[i].rank=FOUR; break;
+            case 4:  deck[i].rank=FIVE; break;
+            case 5:  deck[i].rank=SIX; break;
+            case 6:  deck[i].rank=SEVEN; break;
+            case 7:  deck[i].rank=EIGHT; break;
+            case 8:  deck[i].rank=NINE; break;
+            case 9:  deck[i].rank=TEN; break;
+            case 10: deck[i].rank=JACK; break;
+            case 11: deck[i].rank=QUEEN; break;
+            case 12: deck[i].rank=KING; break;
+            case 13: deck[i].rank=ACE; break;
+        }
+        deck[i].used=NO;
 
         if((i+1)%13==0) /* stuff to make the suit number go from 1 to 4 */
             m++;
@@ -252,25 +161,13 @@ void deck_array_generate(int deck[DECK_SIZE][2])
 }
 
 
-/*
-    deck_array_printf
-
-    RECEIVES: integer array with # of cols - DECK_SIZE, and # of rows - 2
-    EFFECT:
-        -prints out the whole array with lines' numbers
-*/
-void double_array_printf(int array[][2], int ARR_SIZE)
+void cards_printf(struct card *cards, int ARR_SIZE)
 {
     int i;
-    for(i=1; i<=ARR_SIZE; i++)
+    for(i=0; i<ARR_SIZE; i++)
     {
-        int c;
         printf("\t%d\t", i);
-        c=array[i-1][0];
-        printf_card(c, 0);
-        c=array[i-1][1];
-        printf_card(c, 1);
-        printf("\n");
+        printf("%c\t%c\n", cards[i].suit, cards[i].rank);
     }
 }
 
@@ -324,7 +221,7 @@ void build_active(int bank[BANK_SIZE][2], int hand[HAND_SIZE][2], int active[ACT
 void search_combination(int active[ACTIVE][2], int combo[])
 {
     int array[SUIT_SIZE], i;
-    int pair=0, triplet=0;
+    short int pair=0, triplet=0, four=0;
     /*
         i+1 - card number
         array[i] - number of the same cards
@@ -351,34 +248,55 @@ void search_combination(int active[ACTIVE][2], int combo[])
         switch(array[i])
         {
             case 2:
-                pair++;
-                if(pair<=1)
+                if(combo[0]<=2)
                 {
-                    combo[0]=2;
-                    combo[3]=i+1;
-                }
-                else
-                {
-                    combo[0]=3;
-                    combo[4]=i+1;
+                    pair++;
+                    if(pair<=1)         /* one pair */
+                    {
+                        combo[0]=2;
+                        combo[3]=i+1;
+                    }
+                    else            /* two pairs */
+                    {
+                        combo[0]=3;
+                        if(combo[3]<(i+1))
+                        {
+                            combo[4]=combo[3];
+                            combo[3]=i+1;
+                        }
+                        else
+                            combo[4]=i+1;
+                    }
                 }
                 break;
             case 3:
-                triplet++;
-                if(triplet<=1)
+                if(combo[0]<=4)
                 {
-                    combo[0]=4;
-                    combo[3]=i+1;
+                    triplet++;
+                    if(triplet==1&&pair>0)          /* full house */
+                    {
+                        combo[0]=7;
+                        combo[4]=i+1;
+                    }
+                    else if(triplet==1&&pair==0)        /* three */
+                    {
+                        combo[0]=4;
+                        combo[4]=i+1;
+                    }
+                    else if(triplet>1) /* if we find one more triple we write only the bigger one */
+                    {
+                        if((i+1)>combo[4])
+                            combo[4]=i+1;
+                    }
                 }
-                else
-                {
-                    if((i+1)>combo[3])
-                        combo[3]=i+1;
-                }
+                break;
+            case 4:             /* four */
+                four++;
+                combo[0]=8;
+                combo[3]=i+1;
                 break;
         }
     }
-
 
     /*combo[] check for consistency*/
     printf("\n\ncombo\n");
@@ -386,6 +304,8 @@ void search_combination(int active[ACTIVE][2], int combo[])
     {
         printf("\t%d\n", combo[i]);
     }
+
+    /* searching all other combinations here*/
 
 }
 
@@ -416,7 +336,8 @@ void search_combination(int active[ACTIVE][2], int combo[])
     if combo[0]=4 (three of a kind)
     combo[1] = suit (for highest card)
     combo[2] = card # in suit (for highest card)
-    combo[3] = card # in suit (for triplet)
+    combo[3] = NULL
+    combo[4] = card # in suit (for triplet)
 
     if combo[0]=5 (Straight)
     combo[1] = suit (for highest card)
@@ -451,3 +372,19 @@ void search_combination(int active[ACTIVE][2], int combo[])
 
     DO NOT EDIT THIS INFO ** DO NOT EDIT THIS INFO
     */
+
+/*
+Идеи по реализации поиска комбинаций
+массив структур card размера active
+
+0) определить кикер в руке, записать, обновить тип комбинации
+1) в графу used записывать кол-во карт с одинаковым rank'ом - для нахождения количественных комбинаций
+(пара, две пары, тройка, четверка, фул хаус)
+2) отсортировать список полученный в пункте 1) по возрастанию rank'a. искать 5 карт с rank'ом отличающимся от соседа на 1 -
+- для поиска комбинаций(стрит)
+3) проверить графу suit если имеется 5 и более карт одинаковой масти - (флэш)
+вкупе со 2ым условием - (стрит флэш)
+вкупе с предыдущим проверить последнюю карту стрит флеша - если Туз - (флэш рояль)
+
+*/
+

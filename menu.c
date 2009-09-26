@@ -3,7 +3,7 @@
 
 int MainMenu()
 {
-    int choice;
+    int choice,a=2;
     while(1)
     {
         printf("1-start game, 2-settings, 3-quit:\n");
@@ -11,20 +11,15 @@ int MainMenu()
         switch(choice)
         {
             case 1:
-                StartMenu();
+                printf("all systems go!\n");
                 return choice;
-                break;
             case 2:
                 SettingsMenu();
                 break;
             case 3:
-                return choice;
+                return -1;
         }
     }
-}
-void StartMenu()
-{
-    printf("smth1\n");
 }
 int SettingsMenu()
 {
