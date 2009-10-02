@@ -37,6 +37,9 @@
 			<Add library="libSDL.dll.a" />
 			<Add library="libSDLmain.a" />
 		</Linker>
+		<Unit filename="MenuGraphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
