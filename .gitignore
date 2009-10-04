@@ -1,8 +1,11 @@
-bin
-obj
-poker.depend
-poker.layout
+client/bin
+client/obj
+client/poker-client.depend
+client/poker-client.layout
+server/bin
+server/obj
+server/poker-server.depend
+server/poker-server.layout
 space.workspace
 settings.cfg
-poker
 *~
