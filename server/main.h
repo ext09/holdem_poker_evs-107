@@ -9,7 +9,7 @@
 enum bank_stages {BLIND=0, BANK3=3, BANK4, BANK5};
 enum suit_t {HEARTS=3, DIAMONDS, CLUBS, SPADES};
 enum rank_t {TWO=2, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE};
-enum com_t {HIGHEST=1, PAIR, TWOPAIRS, THREE_OF, STRAIGHT, FLUSH, F_HOUSE, FOUR_OF, STR_FLUSH, ROYAL};
+enum com_t {KICKER=1, PAIR, THREE_OF, FOUR_OF, TWOPAIRS, STRAIGHT, FLUSH, F_HOUSE, STR_FLUSH, ROYAL};
 enum statements {NO=0, YES};
 
 struct card {
@@ -20,7 +20,7 @@ struct card {
 
 struct combo {
     enum com_t type; /* combination type */
-    struct card depend;
+    struct card depend[2];
     struct card kicker; /* card-kicker */
     struct card active[HAND_SIZE+BANK5];
     };
