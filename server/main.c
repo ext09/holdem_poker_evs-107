@@ -12,11 +12,11 @@ int main(int argc, char* args[])
     short int i;
     srand(time(NULL));
 
+
+    deck_array_generate(deck);
         /* $$$$$$$$$$$$$$$$$ MAIN STRUCTURE' PROTOTYPE $$$$$$$$$$$$$$$$ */
     while(1)
     {
-        deck_array_generate(deck);
-                        /* UNDER COMMENT SIGNS - JUST TO CLEAN UP THE OUTPUT */
 
         printf("\tDeck Array:\n\n");
         cards_printf(deck, DECK_SIZE);
@@ -27,16 +27,19 @@ int main(int argc, char* args[])
         for (i=0; i<SEATS; i++)
         {
             printf("\n\nPlayer %d\n", i+1);
+
             random_fill_in(deck, players[i].hand, HAND_SIZE);
-            printf("\nHAND:\n");
-            cards_printf(players[i].hand, HAND_SIZE);
+            find_kicker(players[i].hand, &players[i].c);
 
             build_active(bank, players[i].hand, players[i].c.active);
             printf("\n\nACTIVE:\n");
             cards_printf(players[i].c.active, HAND_SIZE+BANK5);
-            find_kicker(players[i].hand, players[i].c);
-            /*search_combination(players[i].c, BANK5); */
+
+            search_combination(&players[i].c, BANK5);
             printf("\n\n\t%d\n", players[i].c.type);
+
+            printf("\nHAND:\n");
+            cards_printf(players[i].hand, HAND_SIZE);
         }
 
         printf("\nYou may test you code here.\n");
@@ -95,16 +98,16 @@ void cards_printf(struct card *cards, int ARR_SIZE)
 }
 
 
-void find_kicker(struct card hand[HAND_SIZE], struct combo c)
+void find_kicker(struct card *hand, struct combo *c)
 {
     int i;
     if(hand[0].rank>hand[1].rank)
         i=0;
-    else if(hand[0].rank<=hand[1].rank)
+    else
         i=1;
-    c.type=KICKER;
-    c.kicker.suit=hand[i].suit;
-    c.kicker.rank=hand[i].rank;
+    c->type=KICKER;
+    c->kicker.suit=hand[i].suit;
+    c->kicker.rank=hand[i].rank;
 }
 
     /*
@@ -133,110 +136,143 @@ void build_active(struct card bank[BANK5], struct card hand[HAND_SIZE], struct c
 
 
     /*  'PAIR'  ,  'TWO PAIRS'    AND   'THREE OF A KIND'   SEARCH*/
-void search_combination(struct combo c, int bank_size)
+void search_combination(struct combo *c, int bank_size)
 {
-    short int i, j, temp;
+    short int i, j, temp, str, h, d, cl, s;
     short int ACTIVE = HAND_SIZE+bank_size;
+
+    h=d=cl=s=str=0;
 
     /* sorting active here*/
     for(i=1; i<ACTIVE; i++)
     {
-        if(c.active[i].rank<c.active[i-1].rank)
+        if(c->active[i].rank<c->active[i-1].rank)
         {
-            for(j=i; c.active[j].rank<c.active[j-1].rank&&j>0; j--)
+            for(j=i; c->active[j].rank<c->active[j-1].rank&&j>0; j--)
             {
-                temp=c.active[j].rank;
-                c.active[j].rank=c.active[j-1].rank;
-                c.active[j-1].rank=temp;
+                temp=c->active[j].rank;
+                c->active[j].rank=c->active[j-1].rank;
+                c->active[j-1].rank=temp;
 
-                temp=c.active[j].suit;
-                c.active[j].suit=c.active[j-1].suit;
-                c.active[j-1].suit=temp;
+                temp=c->active[j].suit;
+                c->active[j].suit=c->active[j-1].suit;
+                c->active[j-1].suit=temp;
             }
         }
     }
 
-    printf("\nsorted active\n");
-    cards_printf(c.active, ACTIVE);
-
-    temp=1; /* int for number of repetitions - unnecessary*/
+    temp=1;
+    /* int for number of repetitions - unnecessary*/
     for(i=1; i<ACTIVE; i++)
     {
-        if(c.active[i].rank==c.active[i-1].rank&&c.type==KICKER) /*pair*/
+        if(c->active[i].rank==c->active[i-1].rank&&c->type==KICKER) /*pair*/
         {
-            c.type=PAIR;
-            c.depend[0].suit=c.active[i].suit;
-            c.depend[0].rank=c.active[i].rank;
+            c->type=PAIR;
+            c->depend[0].suit=c->active[i].suit;
+            c->depend[0].rank=c->active[i].rank;
             if((i+1)<ACTIVE)
             {
-                if(c.active[i].rank==c.active[i+1].rank)
+                if(c->active[i].rank==c->active[i+1].rank)
                 {
-                    c.type=THREE_OF;
+                    c->type=THREE_OF;
                     if((i+2)<ACTIVE)
                     {
-                        if(c.active[i].rank==c.active[i+2].rank)
-                            c.type=FOUR_OF;
+                        if(c->active[i].rank==c->active[i+2].rank)
+                            c->type=FOUR_OF;
                     }
                 }
             }
         }
-        else if(c.active[i].rank==c.active[i-1].rank&&c.type!=KICKER)
+        else if(c->active[i].rank==c->active[i-1].rank&&c->type!=KICKER)
         {
-            switch(c.type) {
+            switch(c->type) {
                 case PAIR:
-                    c.type=TWOPAIRS;
-                    if(c.depend[0].rank>c.active[i].rank)
+                    c->type=TWOPAIRS;
+                    if(c->depend[0].rank>c->active[i].rank)
                     {
-                        c.depend[1].suit=c.active[i].suit;
-                        c.depend[1].rank=c.active[i].rank;
+                        c->depend[1].suit=c->active[i].suit;
+                        c->depend[1].rank=c->active[i].rank;
                     }
                     else
                     {
-                        c.depend[1].suit=c.depend[0].suit;
-                        c.depend[1].rank=c.depend[0].rank;
-                        c.depend[0].suit=c.active[i].suit;
-                        c.depend[0].rank=c.active[i].rank;
+                        c->depend[1].suit=c->depend[0].suit;
+                        c->depend[1].rank=c->depend[0].rank;
+                        c->depend[0].suit=c->active[i].suit;
+                        c->depend[0].rank=c->active[i].rank;
                     }
                     break;
                 case THREE_OF:
-                    c.type=F_HOUSE;
-                    c.depend[1].suit=c.active[i].suit;
-                    c.depend[1].rank=c.active[i].rank;
+                    c->type=F_HOUSE;
+                    c->depend[1].suit=c->active[i].suit;
+                    c->depend[1].rank=c->active[i].rank;
                     break;
                 case FOUR_OF:
                     break;
                 case TWOPAIRS:
-                    if(c.active[i].rank>c.depend[0].rank)
+                    if(c->active[i].rank>c->depend[0].rank)
                     {
-                        c.depend[1].suit=c.depend[0].suit;
-                        c.depend[1].rank=c.depend[0].rank;
-                        c.depend[0].suit=c.active[i].suit;
-                        c.depend[0].rank=c.active[i].rank;
+                        c->depend[1].suit=c->depend[0].suit;
+                        c->depend[1].rank=c->depend[0].rank;
+                        c->depend[0].suit=c->active[i].suit;
+                        c->depend[0].rank=c->active[i].rank;
                     }
-                    else if(c.active[i].rank>c.depend[1].rank)
+                    else if(c->active[i].rank>c->depend[1].rank)
                     {
-                        c.depend[1].suit=c.active[i].suit;
-                        c.depend[1].rank=c.active[i].rank;
+                        c->depend[1].suit=c->active[i].suit;
+                        c->depend[1].rank=c->active[i].rank;
                     }
                     break;
                 case F_HOUSE:
-                    if(c.depend[1].rank<c.active[i].rank)
+                    if(c->depend[1].rank<c->active[i].rank)
                     {
-                        c.depend[1].suit=c.active[i].suit;
-                        c.depend[1].rank=c.active[i].rank;
+                        c->depend[1].suit=c->active[i].suit;
+                        c->depend[1].rank=c->active[i].rank;
                     }
                     else
                         ;
                     break;
+                default:
+                    ;
             }
         }
+        else if(c->active[i].rank+1==c->active[i].rank)
+        {
+            str++;
+        }
+        else if(c->active[i].rank+1!=c->active[i].rank)
+            str=0;
+        if(str>=4)
+        {
+            c->type=STRAIGHT;
+            c->depend[0].suit=c->active[i].suit;
+            c->depend[0].rank=c->active[i].rank;
+            if(c->active[i].suit==c->active[i-1].suit==c->active[i-2].suit==c->active[i-3].suit==c->active[i-4].suit)
+            {
+                c->type=STR_FLUSH;
+                c->depend[0].suit=c->active[i].suit;
+                c->depend[0].rank=c->active[i].rank;
+                if(c->active[i].rank==ACE)
+                {
+                    c->type=ROYAL;
+                    c->depend[0].suit=c->active[i].suit;
+                    c->depend[0].rank=c->active[i].rank;
+                }
+            }
+        }
+        switch(c->active[i].suit)
+        {
+            case HEARTS: h++; break;
+            case DIAMONDS: d++; break;
+            case CLUBS: cl++; break;
+            case SPADES: s++; break;
+        }
+        if(h>=5 || d>=5 || cl>=5 || s>=5)
+        {
+            c->type=FLUSH;
+            c->depend[0].suit=c->active[i].suit;
+            c->depend[0].rank=c->active[i].rank;
+        }
     }
-
-    /* after these manipulations we should've dealt with all numeric combination,
-
-    just to leave STRAIGHT, FLUSH, STRAIGHT FLUSH and ROYAL FLUSH*/
-
-
 }
 
 
